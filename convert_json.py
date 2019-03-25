@@ -8,6 +8,6 @@ def parse(path):
         yield json.dumps(eval(l))
 
 
-f = open("data/output.strict", 'w')
-for l in parse("data/reviews_Books_5.json.gz"):
+f = open("data/meta_Books_strict.json", 'w')
+for l in parse("data/meta_Books.json.gz"):
     f.write(l + '\n')
