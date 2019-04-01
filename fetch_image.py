@@ -6,7 +6,8 @@ from io import BytesIO
 
 
 def fetch_html(url):
-    contents = urllib.request.urlopen(url).read()
+    # contents = urllib.request.urlopen(url).read()
+    contents = requests.get(url).content
     return contents
 
 
