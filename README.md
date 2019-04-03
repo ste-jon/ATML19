@@ -2,7 +2,10 @@
 
 ## Project Topic:
 
-Using Amazon product data http://jmcauley.ucsd.edu/data/amazon/ to obtain images of book covers and applying Deep Learning to the dataset.
+Deep Learning on book covers, using the datasets
+
+* http://jmcauley.ucsd.edu/data/amazon/
+* https://github.com/uchidalab/book-dataset
 
 ## Citations:
 
@@ -10,3 +13,5 @@ Using Amazon product data http://jmcauley.ucsd.edu/data/amazon/ to obtain images
 with one-class collaborative filtering.** WWW, 2016
 * J. McAuley, C. Targett, J. Shi, A. van den Hengel. **Image-based
 recommendations on styles and substitutes.** SIGIR, 2015
+* B. K. Iwana, S. T. Raza Rizvi, S. Ahmed, A. Dengel, and S. Uchida, **Judging 
+a Book by its Cover**, arXiv (2016).
