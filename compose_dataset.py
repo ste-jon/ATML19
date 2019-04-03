@@ -41,21 +41,23 @@ def getDF_json(path):
 #     return image_src
 
 
-csv_names = ['asin/ID', 'imageName', 'imageUrl', 'title', 'author', 'categoryId', 'category']
+csv_names = ['asin', 'imageName', 'imageUrl', 'title', 'author', 'categoryId', 'category']
 csv_df1 = getDF_csv('data/book30-listing-test.csv', encoding='utf_16_be', names=csv_names)
 csv_df2 = getDF_csv('data/book30-listing-train.csv', encoding='utf_16_be', names=csv_names)
 csv_df3 = getDF_csv('data/book32-listing.csv', encoding='iso-8859-1', names=csv_names)
 
 csv_data = pd.concat([csv_df1, csv_df2, csv_df3])
-csv_data.drop_duplicates('asin/ID')
+csv_data.drop_duplicates('asin')
 # csv_data['categories'] = csv_data.apply(lambda row: [row['category']], axis=1)
 csv_data = csv_data.drop(columns=['imageName', 'title', 'author', 'categoryId'])
 print(csv_data.shape)
-print(csv_data.iloc[0])
+csv_data = csv_data.dropna()
+print(csv_data.shape)
+
 # create file
-os.makedirs('data/cleaned', exist_ok=True)
-Path('data/cleaned/books_200000.json').touch()
-csv_data.to_json('data/cleaned/books_200000.json', orient='records')
+os.makedirs('data/processed', exist_ok=True)
+Path('data/processed/books_200000.json').touch()
+csv_data.to_json('data/processed/books_200000.json', orient='records')
 
 
 # json_list = list(parse_data('data/book_descriptions_50000.json'))
