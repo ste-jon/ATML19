@@ -7,6 +7,11 @@ Deep Learning on book covers, using the datasets
 * http://jmcauley.ucsd.edu/data/amazon/
 * https://github.com/uchidalab/book-dataset
 
+In the scope of this project, we explore two tasks:
+
+* Predicting a book's genre based on its cover.
+* Generating book covers for a given genre.
+
 ## Citations:
 
 * R. He, J. McAuley. **Modeling the visual evolution of fashion trends
