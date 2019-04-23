@@ -1,5 +1,5 @@
 
-
+# assigns a book category (genre) to a number, might be useful for a simpler overview (optional?)
 def category_string_to_number(category_string):
         return {
                 "Arts & Photography" :              1,
