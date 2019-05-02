@@ -44,12 +44,18 @@ np.random.shuffle(cover_images)
 
 # set aside 10% for testing
 n_test = math.floor(len(cover_images) * 0.10)
-covers_train = cover_images[n_test:]
-labels_train =  cover_labels[n_test:]
 covers_test = cover_images[:n_test]
 labels_test =  cover_labels[:n_test]
-print(len(labels_train))
-print(labels_train[20])
+
+# split in test and validation set.
+# given in percentage of samples except test set.
+val_split = 0.2
+n_val = n_test + math.floor( (len(cover_images)-n_test) * val_split)
+covers_val = cover_images[n_test:n_val]
+labels_val =  cover_labels[n_test:n_val]
+
+covers_train = cover_images[n_val:]
+labels_train =  cover_labels[n_val:]
 
 # Normalization here given by pytorch (pretrained Alexnet -- Densenet?)
 from torchvision.transforms import ToTensor, Normalize, Compose, Resize
@@ -75,8 +81,8 @@ class CoverDataset(Dataset):
     
     
 # define the datasets
-#TODO implement validation set, split into 3 sets
 train_dataset = CoverDataset(covers_train, labels_train, transform)
+val_dataset = CoverDataset(covers_val, labels_val, transform)
 test_dataset = CoverDataset(covers_test, labels_test, transform)
 
 
@@ -87,7 +93,7 @@ print("Amount in the validation/test set: " + str(len(test_dataset)))
 # define the dataloaders, batch_size 128, 64, 32? Needs to be adjusted for the cluster
 from torch.utils.data import DataLoader
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-#val_loader = DataLoader(val_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 
