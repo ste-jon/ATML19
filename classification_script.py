@@ -136,7 +136,7 @@ optimizer = torch.optim.Adam(alexnet.parameters(), lr=0.003)
 alexnet = alexnet.to(device)
 n_epochs = 1
 # retrain (only that last replaced layer)
-alexnet_retrain = fit(train_loader, test_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
+alexnet_retrain = fit(train_loader, val_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
 
 ### 
 # same procedure with "densenet161" (good performance on ImageNet, new concept)
@@ -158,4 +158,4 @@ optimizer = torch.optim.Adam(densenet.parameters(), lr=0.003)
 densenet = densenet.to(device)
 
 n_epochs = 1
-densenet_retrain = fit(train_loader, test_loader, densenet, optimizer, loss_fn, n_epochs)
+densenet_retrain = fit(train_loader, val_loader, densenet, optimizer, loss_fn, n_epochs)
