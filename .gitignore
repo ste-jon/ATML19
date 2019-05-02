@@ -1,2 +1,4 @@
 data/*
+!data/meta
 .idea
+.ipynb_checkpoints
