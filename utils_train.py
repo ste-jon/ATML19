@@ -10,6 +10,7 @@ def train(model, train_loader, optimizer, loss_fn, print_every=100):
     model.train()
     losses = []
     n_correct = 0
+    n_correct_top3 = 0
     for iteration, (images, labels) in enumerate(train_loader):
         images = images.to(device)
         labels = labels.to(device)
@@ -22,8 +23,14 @@ def train(model, train_loader, optimizer, loss_fn, print_every=100):
 #             print('Training iteration {}: loss {:.4f}'.format(iteration, loss.item()))
         losses.append(loss.item())
         n_correct += torch.sum(output.argmax(1) == labels).item()
+        sorted, indices = output.sort(1 ,descending=True)
+        n_correct_top3 += torch.sum(labels == indices[:,1]).item()
+        n_correct_top3 += torch.sum(labels == indices[:,2]).item()
+
     accuracy = 100.0 * n_correct / len(train_loader.dataset)
-    return np.mean(np.array(losses)), accuracy
+    n_correct_top3 += n_correct;
+    accuracy_top3 = 100.0 * n_correct_top3 / len(train_loader.dataset)
+    return np.mean(np.array(losses)), accuracy, accuracy_top3
             
 def test(model, test_loader, loss_fn):
     '''
@@ -32,6 +39,10 @@ def test(model, test_loader, loss_fn):
     model.eval()
     test_loss = 0
     n_correct = 0
+    n_correct_top3 = 0
+    n_per_label = []
+    n_correct_per_label = []
+    n_correct_per_label_top3 = []
     with torch.no_grad():
         for images, labels in test_loader:
             images = images.to(device)
@@ -40,30 +51,40 @@ def test(model, test_loader, loss_fn):
             loss = loss_fn(output, labels)
             test_loss += loss.item()
             n_correct += torch.sum(output.argmax(1) == labels).item()
+            sorted, indices = output.sort(1 ,descending=True)
+            n_correct_top3 += torch.sum(labels == indices[:,1]).item()
+            n_correct_top3 += torch.sum(labels == indices[:,2]).item()
 
     average_loss = test_loss / len(test_loader)
     accuracy = 100.0 * n_correct / len(test_loader.dataset)
+    n_correct_top3 += n_correct;
+    accuracy_top3 = 100.0 * n_correct_top3 / len(test_loader.dataset)
+
 #     print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(average_loss, accuracy))
-    return average_loss, accuracy
+    return average_loss, accuracy, accuracy_top3
 
 
 def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, scheduler=None):
-    train_losses, train_accuracies = [], []
-    val_losses, val_accuracies = [], []
+    train_losses, train_accuracies, train_accuracies_top3 = [], [], []
+    val_losses, val_accuracies, val_accuracies_top3 = [], [], []
 
     for epoch in range(n_epochs):
-        train_loss, train_accuracy = train(model, train_dataloader, optimizer, loss_fn)
-        val_loss, val_accuracy = test(model, val_dataloader, loss_fn)
+        train_loss, train_accuracy, train_accuracy_top3 = train(model, train_dataloader, optimizer, loss_fn)
+        val_loss, val_accuracy, val_accuracy_top3 = test(model, val_dataloader, loss_fn)
         train_losses.append(train_loss)
         train_accuracies.append(train_accuracy)
+        train_accuracies_top3.append(train_accuracy_top3)
         val_losses.append(val_loss)
         val_accuracies.append(val_accuracy)
+        val_accuracies_top3.append(val_accuracy_top3)
         if scheduler:
             scheduler.step() # argument only needed for ReduceLROnPlateau
-        print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}, val_loss: {:.4f}, val_accuracy: {:.4f}'.format(epoch+1, n_epochs,
+        print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}, top3: {:.4f}, val_loss: {:.4f}, val_accuracy: {:.4f}, top3: {:.4f}'.format(epoch+1, n_epochs,
                                                                                                           train_losses[-1],
                                                                                                           train_accuracies[-1],
+                                                                                                          train_accuracies_top3[-1],
                                                                                                           val_losses[-1],
-                                                                                                          val_accuracies[-1]))
+                                                                                                          val_accuracies[-1],
+                                                                                                          val_accuracies_top3[-1]))
     
     return train_losses, train_accuracies, val_losses, val_accuracies
