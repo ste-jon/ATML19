@@ -24,10 +24,13 @@ def load_images(data_root, image_paths, target_size):
         path = os.path.join(data_root, img_path)
         img = Image.open(path)
         img = img.resize(target_size)
-        images.append(np.array(img))
+        
         img_label = img_path[img_path.find("_")+1:-4]
         img_label = category_string_to_number(img_label)
-        labels.append(img_label)
+
+        if(img_label >= 0):
+            images.append(np.array(img))
+            labels.append(img_label)
     return images, labels
 
 n_imgs = 4000
@@ -137,7 +140,6 @@ alexnet = alexnet.to(device)
 n_epochs = 1
 # retrain (only that last replaced layer)
 alexnet_retrain = fit(train_loader, val_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
-
 ### 
 # same procedure with "densenet161" (good performance on ImageNet, new concept)
 ###
