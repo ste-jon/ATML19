@@ -40,9 +40,10 @@ def test(model, test_loader, loss_fn):
     test_loss = 0
     n_correct = 0
     n_correct_top3 = 0
-    n_per_label = []
-    n_correct_per_label = []
-    n_correct_per_label_top3 = []
+    n_per_label = np.zeros(30)
+    n_correct_per_label = np.zeros(30)
+    n_correct_per_label_top3 = np.zeros(30)
+    cnt = 0;
     with torch.no_grad():
         for images, labels in test_loader:
             images = images.to(device)
@@ -54,12 +55,29 @@ def test(model, test_loader, loss_fn):
             sorted, indices = output.sort(1 ,descending=True)
             n_correct_top3 += torch.sum(labels == indices[:,1]).item()
             n_correct_top3 += torch.sum(labels == indices[:,2]).item()
+            for it, label in enumerate(labels):
+                #print(label.item())
+                #print('label: {}, output: {}'.format(label_tensor.item(), indices[it,0].item()))
+                cnt += 1
+                #print((label == indices[it,0]).item())
+                
+                n_per_label[label.item()] += 1
+                n_correct_per_label[label.item()] += (label == indices[it,0]).item()
+                n_correct_per_label_top3[label] += (label == indices[it,0]).item()
+                n_correct_per_label_top3[label] += (label == indices[it,1]).item()
+                n_correct_per_label_top3[label] += (label == indices[it,2]).item()
 
     average_loss = test_loss / len(test_loader)
     accuracy = 100.0 * n_correct / len(test_loader.dataset)
-    n_correct_top3 += n_correct;
+    n_correct_top3 += n_correct
     accuracy_top3 = 100.0 * n_correct_top3 / len(test_loader.dataset)
+  
+    accuracy_per_label = 100 * np.divide(n_correct_per_label, n_per_label)
+    accuracy_per_label_top3 = 100 * np.divide(n_correct_per_label_top3, n_per_label)
+    
 
+    for it, nbr in enumerate(n_per_label):
+        print('Label: {}, Numbers: {}, accuracy_per_label: {:.4f}, accuracy_per_label_top3: {:.4f}'.format(it, nbr, accuracy_per_label[it], accuracy_per_label_top3[it]))
 #     print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(average_loss, accuracy))
     return average_loss, accuracy, accuracy_top3
 
