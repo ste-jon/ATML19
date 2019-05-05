@@ -1,5 +1,3 @@
-from pathlib import Path
-from bs4 import BeautifulSoup
 from PIL import Image
 import os
 
