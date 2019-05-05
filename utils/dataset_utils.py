@@ -97,6 +97,3 @@ def create_folder_to_cat_dict(filename=None):
         with open(filename, 'w+') as json_file:
             js.dump(dict, json_file, indent=4, sort_keys=True)
     return dict
-
-dict = create_folder_to_cat_dict('data/meta/folder_to_cat.json')
-print(dict)
