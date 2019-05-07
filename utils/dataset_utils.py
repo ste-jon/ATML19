@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import gzip
 from pathlib import Path
+import re
+import json as js
 
 
 def parse_data(fname):
@@ -73,5 +75,25 @@ def collect_labels():
         break
     return d
 
-d = collect_labels()
-print(d)
+
+def category_to_folder(category):
+    name = category.lower()
+    name = re.sub('[^\w^\s]', '', name)
+    name = name.replace(' ', '_')
+    name = name.replace('__', '_')
+    return name
+
+
+def create_folder_to_cat_dict(filename=None):
+    df = pd.read_json('data/processed/books_200000.json')
+    categories = df.category.unique()
+    categories.sort()
+    dict = {}
+    for c in categories:
+        folder = category_to_folder(c)
+        dict[folder] = c
+    if (filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, 'w+') as json_file:
+            js.dump(dict, json_file, indent=4, sort_keys=True)
+    return dict
