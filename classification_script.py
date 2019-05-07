@@ -4,6 +4,7 @@ import os
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor, Normalize, Compose, Resize
 from torch.utils.data import DataLoader
+from utils_labels import idx_to_class
 from utils_labels import folder_to_cat_dict
 import matplotlib.pyplot as plt
 
@@ -57,7 +58,7 @@ from utils_train import train, test, fit
 # 3) replace the last output layer with our custom one
 ###
 
-num_classes = 30 # might change to 32?
+num_classes = 32 # might change to 32?
 
 alexnet = models.alexnet(pretrained=True)
 
@@ -80,6 +81,12 @@ alexnet = alexnet.to(device)
 n_epochs = 1
 # retrain (only that last replaced layer)
 alexnet_retrain = fit(train_loader, val_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
+
+# Print per lable accuracy
+accuracy_per_label, accuracy_per_label_top3 = alexnet_retrain[4:6]
+for it, nbr in enumerate(accuracy_per_label):
+        print('{}: accuracy: {:.4f}, top 3 accuracy: {:.4f}'.format(folder_to_category[idx_to_class(it, class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
+exit()
 ### 
 # same procedure with "densenet161" (good performance on ImageNet, new concept)
 ###

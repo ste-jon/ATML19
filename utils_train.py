@@ -40,9 +40,9 @@ def test(model, test_loader, loss_fn):
     test_loss = 0
     n_correct = 0
     n_correct_top3 = 0
-    n_per_label = np.zeros(30)
-    n_correct_per_label = np.zeros(30)
-    n_correct_per_label_top3 = np.zeros(30)
+    n_per_label = np.zeros(32)
+    n_correct_per_label = np.zeros(32)
+    n_correct_per_label_top3 = np.zeros(32)
     cnt = 0;
     with torch.no_grad():
         for images, labels in test_loader:
@@ -56,11 +56,6 @@ def test(model, test_loader, loss_fn):
             n_correct_top3 += torch.sum(labels == indices[:,1]).item()
             n_correct_top3 += torch.sum(labels == indices[:,2]).item()
             for it, label in enumerate(labels):
-                #print(label.item())
-                #print('label: {}, output: {}'.format(label_tensor.item(), indices[it,0].item()))
-                cnt += 1
-                #print((label == indices[it,0]).item())
-                
                 n_per_label[label.item()] += 1
                 n_correct_per_label[label.item()] += (label == indices[it,0]).item()
                 n_correct_per_label_top3[label] += (label == indices[it,0]).item()
@@ -75,11 +70,7 @@ def test(model, test_loader, loss_fn):
     accuracy_per_label = 100 * np.divide(n_correct_per_label, n_per_label)
     accuracy_per_label_top3 = 100 * np.divide(n_correct_per_label_top3, n_per_label)
     
-
-    for it, nbr in enumerate(n_per_label):
-        print('Label: {}, Numbers: {}, accuracy_per_label: {:.4f}, accuracy_per_label_top3: {:.4f}'.format(it, nbr, accuracy_per_label[it], accuracy_per_label_top3[it]))
-#     print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(average_loss, accuracy))
-    return average_loss, accuracy, accuracy_top3
+    return average_loss, accuracy, accuracy_top3, accuracy_per_label, accuracy_per_label_top3
 
 
 def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, scheduler=None):
@@ -88,7 +79,7 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
 
     for epoch in range(n_epochs):
         train_loss, train_accuracy, train_accuracy_top3 = train(model, train_dataloader, optimizer, loss_fn)
-        val_loss, val_accuracy, val_accuracy_top3 = test(model, val_dataloader, loss_fn)
+        val_loss, val_accuracy, val_accuracy_top3, val_accuracy_per_label, val_accuracy_per_label_top3 = test(model, val_dataloader, loss_fn)
         train_losses.append(train_loss)
         train_accuracies.append(train_accuracy)
         train_accuracies_top3.append(train_accuracy_top3)
@@ -105,4 +96,4 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
                                                                                                           val_accuracies[-1],
                                                                                                           val_accuracies_top3[-1]))
     
-    return train_losses, train_accuracies, val_losses, val_accuracies
+    return train_losses, train_accuracies, val_losses, val_accuracies, val_accuracy_per_label, val_accuracy_per_label_top3
