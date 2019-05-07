@@ -7,7 +7,7 @@ from utils.dataset_utils import category_to_folder, getDF_json
 
 covers_extension = '.jpeg'
 covers_src_dir = '../data/coversraw/'
-covers_target_dir = '../data/covers/'
+covers_target_dir = '../data/covers/sample/'
 df_all = getDF_json('../data/processed/books_200000.json')
 
 
@@ -47,4 +47,9 @@ def copy(df, set_name):
         else: raise Exception('file not found')
 
 
-split(df_all, .1, .1, covers_target_dir)
+# split(df_all, .1, .1, covers_target_dir)
+
+# sample
+df_all = df_all.sample(frac=1).reset_index(drop=True)
+sub_df = df_all[:10000]
+split(sub_df, .1, .1, covers_target_dir)
