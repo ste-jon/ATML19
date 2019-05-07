@@ -7,5 +7,5 @@ def idx_to_class(index, dict):
             return name
 
 def folder_to_cat_dict(path):
-    with open('path', 'w') as outfile:
+    with open(path, 'r') as outfile:
         return json.load(outfile)

@@ -14,7 +14,7 @@ cover_dir_test = 'data/covers/test'
 cover_dir_val = 'data/covers/valid'
 
 # Normalization here given by pytorch (pretrained Alexnet -- Densenet?)
-target_size = (32, 32)
+target_size = (224, 224)
 transforms = Compose([Resize(target_size),
                     ToTensor(),
                     Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
