@@ -1,35 +1,11 @@
+import json
 
 # assigns a book category (genre) to a number, might be useful for a simpler overview (optional?)
-def category_string_to_number(category_string):
-        return {
-                "Arts & Photography" :              0,
-                "Biographies & Memoirs" :           1,
-                "Business & Money" :                2,
-                "Calendars" :                       3,
-                "Children’s Books" :                4,
-                "Comics & Graphic Novels" :         5,
-                "Computers & Technology" :          6,
-                "Cookbooks, Food & Wine" :          7,
-                "Crafts, Hobbies & Home" :          8,
-                "Christian Books & Bibles" :        9,
-                "Engineering & Transportation" :    10,
-                "Health, Fitness & Dieting" :       11,
-                "History" :                         12,
-                "Humor & Entertainment" :           13,
-                "Law" :                             14,
-                "Literature & Fiction" :            15,
-                "Medical Books" :                   16,
-                "Mystery, Thriller & Suspense" :    17,
-                "Parenting & Relationships" :       18,
-                "Politics & Social Sciences" :      19,
-                "Reference" :                       20,
-                "Religion & Spirituality" :         21,
-                "Romance" :                         22,
-                "Science & Math" :                  23,
-                "Science Fiction & Fantasy" :       24,
-                "Self-Help" :                       25,
-                "Sports & Outdoors" :               26,
-                "Teen & Young Adult" :              27,
-                "Test Preparation" :                28,
-                "Travel" :                          29
-                }.get(category_string, -1)  # return the integer, by default -1 (i.e. not found)
+def idx_to_class(index, dict):
+    for name, idx in dict.items():
+        if idx == index:
+            return name
+
+def folder_to_cat_dict(path):
+    with open('path', 'w') as outfile:
+        return json.load(outfile)
