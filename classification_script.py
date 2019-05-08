@@ -6,6 +6,12 @@ from torchvision.transforms import ToTensor, Normalize, Compose, Resize
 from torch.utils.data import DataLoader
 from utils_labels import idx_to_class
 from utils_labels import folder_to_cat_dict
+from utils_save import save_performance
+
+savedir = ''
+savedir = 'parameters/'
+loaddir = ''
+#loaddir = 'parameters/'
 
 
 # import the covers
@@ -45,11 +51,9 @@ import torch
 from torchvision import *
 import torchvision.models as models
 import torch.nn as nn
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-import torch.nn as nn
 from utils_train import train, test, fit
 
-
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 ### 
 # 1) Import a pretrained Alexnet model from pytroch
@@ -58,33 +62,41 @@ from utils_train import train, test, fit
 ###
 
 num_classes = 32
-
 alexnet = models.alexnet(pretrained=True)
-
+loss_fn = nn.CrossEntropyLoss()
 
 for param in alexnet.parameters():
-    param.requires_grad = False # == do not change weights, do not re-train
-
+    param.requires_grad = False  # == do not change weights, do not re-train
 
 ## fixed, pre-trained alexnet. Now, replace the last layer:
 alexnet.classifier._modules['6'] = nn.Linear(4096, num_classes)
 print(*list(alexnet.children()))  # show the model (optional)
 
+if loaddir == '':
+    # needs to be defined on the cluster training procedure
+    optimizer = torch.optim.Adam(alexnet.parameters(), lr=0.003)
 
-# needs to be defined on the cluster training procedure
-loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(alexnet.parameters(), lr=0.003)
+    alexnet = alexnet.to(device)
+    n_epochs = 1
+    # retrain (only that last replaced layer)
+    alexnet_retrain = fit(train_loader, val_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
+else:
+    alexnet = torch.load(loaddir+'model_parameter.pt')
+    alexnet.eval
 
 
-alexnet = alexnet.to(device)
-n_epochs = 1
-# retrain (only that last replaced layer)
-alexnet_retrain = fit(train_loader, val_loader, model=alexnet, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
-
+# Print test accuracy
+print('Test loss: {:.4f}, Test accuracy: {:.4f}, top3 accuracy: {:.4f}'.format(alexnet_retrain[2][-1],
+                                                                               alexnet_retrain[3][-1],
+                                                                               alexnet_retrain[4][-1]))
 # Print per lable accuracy
-accuracy_per_label, accuracy_per_label_top3 = alexnet_retrain[4:6]
+accuracy_per_label, accuracy_per_label_top3 = alexnet_retrain[5:7]
 for it, nbr in enumerate(accuracy_per_label):
         print('{}: accuracy: {:.4f}, top 3 accuracy: {:.4f}'.format(folder_to_category[idx_to_class(it, class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
+
+if savedir != '':
+    torch.save(alexnet, savedir + 'model_parameter.pt')
+    save_performance(savedir, 'Validation', alexnet_retrain)
 
 ### 
 # same procedure with "densenet161" (good performance on ImageNet, new concept)
@@ -107,3 +119,19 @@ densenet = densenet.to(device)
 
 n_epochs = 1
 densenet_retrain = fit(train_loader, val_loader, densenet, optimizer, loss_fn, n_epochs)
+
+
+## TEST:
+test_output = test(model, test_loader, loss_fn)
+
+# Print test accuracy
+print('Test loss: {:.4f}, Test accuracy: {:.4f}, top3 accuracy: {:.4f}'.format(test_output[0],
+                                                                               test_output[1],
+                                                                               test_output[2]))
+# Print per lable accuracy
+accuracy_per_label, accuracy_per_label_top3 = test_output[3:5]
+for it, nbr in enumerate(accuracy_per_label):
+        print('{}: accuracy: {:.4f}, top 3 accuracy: {:.4f}'.format(folder_to_category[idx_to_class(it, class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
+
+if savedir != '':
+    save_performance(savedir, 'Test', test_output)

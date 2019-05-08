@@ -30,7 +30,7 @@ def train(model, train_loader, optimizer, loss_fn, print_every=100):
     accuracy = 100.0 * n_correct / len(train_loader.dataset)
     n_correct_top3 += n_correct;
     accuracy_top3 = 100.0 * n_correct_top3 / len(train_loader.dataset)
-    
+
     return np.mean(np.array(losses)), accuracy, accuracy_top3
             
 def test(model, test_loader, loss_fn):
@@ -97,4 +97,4 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
                                                                                                           val_accuracies[-1],
                                                                                                           val_accuracies_top3[-1]))
     
-    return train_losses, train_accuracies, val_losses, val_accuracies, val_accuracy_per_label, val_accuracy_per_label_top3
+    return train_losses, train_accuracies, val_losses, val_accuracies, val_accuracies_top3,val_accuracy_per_label, val_accuracy_per_label_top3
