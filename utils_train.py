@@ -30,6 +30,7 @@ def train(model, train_loader, optimizer, loss_fn, print_every=100):
     accuracy = 100.0 * n_correct / len(train_loader.dataset)
     n_correct_top3 += n_correct;
     accuracy_top3 = 100.0 * n_correct_top3 / len(train_loader.dataset)
+    
     return np.mean(np.array(losses)), accuracy, accuracy_top3
             
 def test(model, test_loader, loss_fn):
