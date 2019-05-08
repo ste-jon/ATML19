@@ -97,4 +97,4 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
                                                                                                           val_accuracies[-1],
                                                                                                           val_accuracies_top3[-1]))
     
-    return train_losses, train_accuracies, val_losses, val_accuracies, val_accuracies_top3,val_accuracy_per_label, val_accuracy_per_label_top3
+    return train_losses, train_accuracies, train_accuracies_top3, val_losses, val_accuracies, val_accuracies_top3,val_accuracy_per_label, val_accuracy_per_label_top3
