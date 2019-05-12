@@ -2,11 +2,13 @@ import numpy as np
 import torch
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+print(device)
 
 def train(model, train_loader, optimizer, loss_fn, print_every=100):
     '''
     Trains the model for one epoch
     '''
+    model = model.to(device)
     model.train()
     losses = []
     n_correct = 0
@@ -37,6 +39,7 @@ def test(model, test_loader, loss_fn):
     '''
     Tests the model on data from test_loader
     '''
+    model = model.to(device)
     model.eval()
     test_loss = 0
     n_correct = 0
@@ -78,6 +81,15 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
     train_losses, train_accuracies, train_accuracies_top3 = [], [], []
     val_losses, val_accuracies, val_accuracies_top3 = [], [], []
 
+
+    ### early stopping settings:
+    from copy import deepcopy
+    best_val_loss = np.inf
+    best_model = None
+    patience = 5
+    counter = 0
+    ###
+
     for epoch in range(n_epochs):
         train_loss, train_accuracy, train_accuracy_top3 = train(model, train_dataloader, optimizer, loss_fn)
         val_loss, val_accuracy, val_accuracy_top3, val_accuracy_per_label, val_accuracy_per_label_top3 = test(model, val_dataloader, loss_fn)
@@ -96,5 +108,17 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
                                                                                                           val_losses[-1],
                                                                                                           val_accuracies[-1],
                                                                                                           val_accuracies_top3[-1]))
-    
-    return train_losses, train_accuracies, train_accuracies_top3, val_losses, val_accuracies, val_accuracies_top3,val_accuracy_per_label, val_accuracy_per_label_top3
+        ### Early stopping implementation
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            best_model = deepcopy(model)
+            counter = 0
+        else:
+            counter += 1
+        if counter == patience:
+            print('No improvement for {} epochs; training stopped.'.format(patience))
+            break
+        ###
+
+
+    return train_losses, train_accuracies, train_accuracies_top3, val_losses, val_accuracies, val_accuracies_top3,val_accuracy_per_label, val_accuracy_per_label_top3, best_model

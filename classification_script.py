@@ -20,4 +20,9 @@ save_dir = args.save
 
 classifier = Classification(data_path = data_path, meta_path = meta_path, batch_size = batch_size, save_dir=save_dir)
 
+### training
 classifier.train(network_name=network_name, n_epochs = n_epochs, do_print = True)
+
+
+### test
+classifier.test(network_name = network_name)

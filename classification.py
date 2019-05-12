@@ -6,7 +6,7 @@ from torchvision.transforms import ToTensor, Normalize, Compose, Resize
 from torch.utils.data import DataLoader
 from utils_labels import idx_to_class
 from utils_labels import folder_to_cat_dict
-from utils_save import save_performance
+from utils_save import save_performance, save_test_results
 
 import torch
 from torchvision import *
@@ -68,16 +68,20 @@ class Classification:
 
         performance = fit(self.train_loader, self.val_loader, model=model, optimizer=optimizer, loss_fn=loss_fn, n_epochs=n_epochs)
 
+        # training returns:
+        best_model = performance[8] # the model saved by early stopping in the fit procedure
+        val_loss, val_acc, val_3_acc = performance[3][-1], performance[4][-1], performance[5][-1]
+        accuracy_per_label, accuracy_per_label_top3 = performance[6:8]
+
         if do_print:
-            # Print test accuracy
-            print('Validation loss: {:.4f}, Validation accuracy: {:.4f}, Validation top3 accuracy: {:.4f}'.format(performance[3][-1], 
-                                                                                                                    performance[4][-1], 
-                                                                                                                    performance[5][-1]))
+            # Print validation accuracy
+            print('Validation loss: {:.4f}, Validation accuracy: {:.4f}, Validation top3 accuracy: {:.4f}'.format(val_loss, 
+                                                                                                                    val_acc, 
+                                                                                                                    val_3_acc))
             
             # Print per lable accuracy
-            accuracy_per_label, accuracy_per_label_top3 = performance[6:8]
             for it, acc in enumerate(accuracy_per_label):
-                    print('{}: accuracy: {:.4f}, top 3 accuracy: {:.4f}'.format(self.folder_to_category[idx_to_class(it, self.class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
+                    print('{}: val_accuracy: {:.4f}, top 3 val_accuracy: {:.4f}'.format(self.folder_to_category[idx_to_class(it, self.class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
 
         if self.savedir != '':
             try:
@@ -85,7 +89,7 @@ class Classification:
                 print("Directory " , self.savedir ,  "Save directory Created ") 
             except FileExistsError:
                 print("Directory " , self.savedir ,  "Save directory already exists")
-            torch.save(model, self.savedir + network_name +'_model_parameter.pt')
+            torch.save(best_model, self.savedir + network_name +'_model_parameter.pt')
             save_performance(self.savedir, network_name + '_train', performance[0:3])
             save_performance(self.savedir, network_name + '_validation', performance[3:8])
 
@@ -107,7 +111,7 @@ class Classification:
 
         # needs to be defined on the cluster training procedure
         loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(alexnet.parameters(), lr=0.003)
+        optimizer = torch.optim.Adam(alexnet.parameters(), lr=0.001)
         alexnet = alexnet.to(self.device)
 
         return alexnet, optimizer, loss_fn
@@ -130,13 +134,14 @@ class Classification:
 
         # retrain densenet
         loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(densenet.parameters(), lr=0.003)
+        optimizer = torch.optim.Adam(densenet.parameters(), lr=0.001)
         densenet = densenet.to(self.device)
 
         return densenet, optimizer, loss_fn
 
 
     def test(self, network_name = 'alexnet'):
+
         model = torch.load(self.loaddir + network_name + '_model_parameter.pt')
         loss_fn = nn.CrossEntropyLoss()
         test_output = test(model, self.test_loader, loss_fn)
@@ -151,4 +156,4 @@ class Classification:
                 print('{}: accuracy: {:.4f}, top 3 accuracy: {:.4f}'.format(self.folder_to_category[idx_to_class(it, self.class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
 
         if self.savedir != '':
-            save_performance(self.savedir, network_name + '_test', test_output)
+            save_test_results(self.savedir, network_name + '_test', test_output)
