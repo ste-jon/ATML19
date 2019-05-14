@@ -22,14 +22,13 @@ def find_img_src(html_doc):
 
 
 def fetch_image(url, save_path, name, skip_if_exists=True):
-    fname = save_path + name
-    if skip_if_exists and os.path.isfile(fname + '.jpe'):
+    filename = os.path.join(save_path, name + '.jpeg')
+    if skip_if_exists and os.path.isfile(filename):
         return
     response = requests.get(url)
-    content_type = response.headers['content-type']
-    extension = mimetypes.guess_extension(content_type)
     img = Image.open(BytesIO(response.content))
-    img.save(save_path + name + extension)
+    if img.format != 'JPEG': img = img.convert('RGB')
+    img.save(filename, 'jpeg')
 
 
 def do_fetch(d):
@@ -38,7 +37,7 @@ def do_fetch(d):
         asin = row.asin
         imageUrl = row.imageUrl
         try:
-            fetch_image(imageUrl, 'data/covers/', asin)
+            fetch_image(imageUrl, 'data/coversraw/', asin)
         except Exception as e:
             print(asin + ' failed. ' + str(e))
             os.makedirs('data/processed', exist_ok=True)
