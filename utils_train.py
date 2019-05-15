@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from torch.optim.lr_scheduler import StepLR
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 print(device)
@@ -86,9 +87,12 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
     from copy import deepcopy
     best_val_loss = np.inf
     best_model = None
-    patience = 5
+    patience = 10
     counter = 0
     ###
+
+    ### Ajust Learning Rate
+    scheduler = StepLR(optimizer, step_size=1, gamma=0.9)
 
     for epoch in range(n_epochs):
         train_loss, train_accuracy, train_accuracy_top3 = train(model, train_dataloader, optimizer, loss_fn)
@@ -108,6 +112,10 @@ def fit(train_dataloader, val_dataloader, model, optimizer, loss_fn, n_epochs, s
                                                                                                           val_losses[-1],
                                                                                                           val_accuracies[-1],
                                                                                                           val_accuracies_top3[-1]))
+        
+        ### Ajust Learning Rate
+        scheduler.step()
+
         ### Early stopping implementation
         if val_loss < best_val_loss:
             best_val_loss = val_loss
