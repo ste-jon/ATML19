@@ -81,7 +81,7 @@ class Classification:
             
             # Print per lable accuracy
             for it, acc in enumerate(accuracy_per_label):
-                    print('{}: val_accuracy: {:.4f}, top 3 val_accuracy: {:.4f}'.format(self.folder_to_category[idx_to_class(it, self.class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
+                print('{}: val_accuracy: {:.4f}, top 3 val_accuracy: {:.4f}'.format(self.folder_to_category[idx_to_class(it, self.class_to_idx)], accuracy_per_label[it], accuracy_per_label_top3[it]))
 
         if self.savedir != '':
             try:

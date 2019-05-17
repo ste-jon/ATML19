@@ -45,9 +45,9 @@ def test(model, test_loader, loss_fn):
     test_loss = 0
     n_correct = 0
     n_correct_top3 = 0
-    n_per_label = np.zeros(32)
-    n_correct_per_label = np.zeros(32)
-    n_correct_per_label_top3 = np.zeros(32)
+    n_per_label = np.zeros(30)
+    n_correct_per_label = np.zeros(30)
+    n_correct_per_label_top3 = np.zeros(30)
     cnt = 0;
     with torch.no_grad():
         for images, labels in test_loader:
