@@ -6,23 +6,15 @@ import pandas as pd
 
 from utils.dataset_utils import category_to_folder, getDF_json
 
-# covers_extension = '.jpeg'
-# covers_src_dir = '../data/coversraw/'
-# covers_target_dir = '../data/covers/normalized/'
-# df_all = getDF_json('../data/processed/books_200000.json')
-# excludes = ['Gay & Lesbian', 'Education & Teaching']
-# normalize = True
-
-
 def clear(root_dir):
     contents = os.listdir(root_dir)
     for content in contents:
         shutil.rmtree(os.path.join(root_dir, content))
 
 
-def split(df, test_split, val_split, src_dir, target_dir, covers_extension, normalize=False, excludes=None):
+def split(df, test_split, val_split, src_dir, target_dir, covers_extension, normalize=False, excludes=None, clear=False):
     # clear existing split
-    clear(target_dir)
+    if clear: clear(target_dir)
     # shuffle
     df = df.sample(frac=1).reset_index(drop=True)
     if excludes:
@@ -65,7 +57,7 @@ def copy(df, set_name, covers_src_dir, covers_target_dir, covers_extension):
             target_dir = os.path.join(covers_target_dir, set_name, cat_folder_name)
             dest_cover_fname = os.path.join(target_dir, asin + covers_extension)
             os.makedirs(os.path.dirname(dest_cover_fname), exist_ok=True)
-            print('copy ' + src_cover_fname + ' to ' + dest_cover_fname)
+            # print('copy ' + src_cover_fname + ' to ' + dest_cover_fname)
             shutil.copyfile(src_cover_fname, dest_cover_fname)
         else: raise Exception('file not found')
 
@@ -101,4 +93,4 @@ def create_image_folders(ds_json, covers_src_dir, covers_target_dir, test_split=
     df = getDF_json(ds_json)
     df = df.sample(frac=1).reset_index(drop=True)
     split(df, test_split, val_split, covers_src_dir, covers_target_dir, '.jpeg', normalize=normalize, excludes=excludes)
-
+    print('Done')

@@ -24,7 +24,7 @@ def find_img_src(html_doc):
 
 def fetch_image(url, save_path, name, skip_if_exists=True):
     fname = os.path.join(save_path, name + '.jpeg')
-    if skip_if_exists and (os.path.isfile(fname + '.jpe') or os.path.isfile(fname + '.jpeg')):
+    if skip_if_exists and os.path.isfile(fname):
         return
     response = requests.get(url)
     img = Image.open(BytesIO(response.content))
