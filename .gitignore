@@ -1,4 +1,6 @@
 data/covers/*
+data/coversraw/*
+data/raw/*
 !data/meta
 .idea
 .ipynb_checkpoints/
