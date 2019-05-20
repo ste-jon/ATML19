@@ -23,15 +23,13 @@ def find_img_src(html_doc):
 
 
 def fetch_image(url, save_path, name, skip_if_exists=True):
-    fname = os.path.join(save_path, name)
+    fname = os.path.join(save_path, name + '.jpeg')
     if skip_if_exists and (os.path.isfile(fname + '.jpe') or os.path.isfile(fname + '.jpeg')):
         return
     response = requests.get(url)
-    content_type = response.headers['content-type']
-    extension = mimetypes.guess_extension(content_type)
     img = Image.open(BytesIO(response.content))
-    print(fname+extension)
-    img.save(fname + extension)
+    if img.format != 'JPEG': img = img.convert('RGB')
+    img.save(fname, 'jpeg')
 
 
 def batch_fetch(d, save_dir, log_dir, verbose=False):
