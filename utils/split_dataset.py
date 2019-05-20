@@ -6,12 +6,12 @@ import pandas as pd
 
 from utils.dataset_utils import category_to_folder, getDF_json
 
-covers_extension = '.jpeg'
-covers_src_dir = '../data/coversraw/'
-covers_target_dir = '../data/covers/normalized/'
-df_all = getDF_json('../data/processed/books_200000.json')
-excludes = ['Gay & Lesbian', 'Education & Teaching']
-normalize = True
+# covers_extension = '.jpeg'
+# covers_src_dir = '../data/coversraw/'
+# covers_target_dir = '../data/covers/normalized/'
+# df_all = getDF_json('../data/processed/books_200000.json')
+# excludes = ['Gay & Lesbian', 'Education & Teaching']
+# normalize = True
 
 
 def clear(root_dir):
@@ -20,7 +20,7 @@ def clear(root_dir):
         shutil.rmtree(os.path.join(root_dir, content))
 
 
-def split(df, test_split, val_split, target_dir, normalize=False, excludes=None):
+def split(df, test_split, val_split, src_dir, target_dir, covers_extension, normalize=False, excludes=None):
     # clear existing split
     clear(target_dir)
     # shuffle
@@ -41,20 +41,20 @@ def split(df, test_split, val_split, target_dir, normalize=False, excludes=None)
         df = pd.concat([df, df_test]).drop_duplicates(keep=False)
         df_val = select_num_of_cat(df, num_val)
         df_train = pd.concat([df, df_val]).drop_duplicates(keep=False)
-        copy(df_val, 'valid')
-        copy(df_test, 'test')
-        copy(df_train, 'train')
+        copy(df_val, 'valid', src_dir, target_dir, covers_extension)
+        copy(df_test, 'test', src_dir, target_dir, covers_extension)
+        copy(df_train, 'train', src_dir, target_dir, covers_extension)
     else:
         num_test = math.floor(df.shape[0]*test_split)
         num_val = math.floor(df.shape[0]*val_split)
         print(df.shape[0])
         print(num_test, num_val)
-        copy(df[:num_val], 'valid')
-        copy(df[-num_test:], 'test')
-        copy(df[num_val:-num_test], 'train')
+        copy(df[:num_val], 'valid', src_dir, target_dir, covers_extension)
+        copy(df[-num_test:], 'test', src_dir, target_dir, covers_extension)
+        copy(df[num_val:-num_test], 'train', src_dir, target_dir, covers_extension)
 
 
-def copy(df, set_name):
+def copy(df, set_name, covers_src_dir, covers_target_dir, covers_extension):
     for row in df.itertuples():
         cat_name = row.category
         asin = row.asin
@@ -97,6 +97,8 @@ def select_num_of_cat(df, num):
     return pd.concat(slices)
 
 
-# df_all = df_all.sample(frac=1).reset_index(drop=True)
-# sub_df = df_all[:10000]
-split(df_all, .1, .1, covers_target_dir, normalize=True, excludes=excludes)
+def create_image_folders(ds_json, covers_src_dir, covers_target_dir, test_split=0.1, val_split=0.1, normalize=False, excludes=None):
+    df = getDF_json(ds_json)
+    df = df.sample(frac=1).reset_index(drop=True)
+    split(df, test_split, val_split, covers_src_dir, covers_target_dir, '.jpeg', normalize=normalize, excludes=excludes)
+
