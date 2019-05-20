@@ -86,3 +86,32 @@ def plot_learning(data, filename = None):
     ax.legend()
     if filename is not None:
         plt.savefig('plots/'+filename, dpi = 150)
+
+
+# strictly for GAN postprocessed csv files only
+import csv
+def plot_gan_losses(savedir, csv_name, filename):
+    epochs = []
+    d_losses = []
+    g_losses = []
+    lossreader = csv.reader(open(savedir + csv_name, newline=''), delimiter=';')
+    # skip header:
+    next(lossreader)
+    for row in lossreader:
+        epochs.append(int(row[0]))
+        d_losses.append(float(row[1]))
+        g_losses.append(float(row[2]))
+
+    # plot the collected data
+    plt.plot(epochs, d_losses, color='r', label='D Loss')
+    plt.plot(epochs, g_losses, color='g', label='G Loss')
+    #plt.axis([0, 500, -10, 10])
+    plt.xlabel('epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.title('WGAN GP loss')
+    if filename is not None:
+        plt.savefig('plots/'+filename, dpi = 150)
+
+
+
