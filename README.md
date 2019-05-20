@@ -12,6 +12,9 @@ In the scope of this project, we explore two tasks:
 * Predicting a book's genre based on its cover.
 * Generating book covers for a given genre.
 
+Get the prepared dataset and trained networks from 
+[here](https://drive.google.com/drive/folders/1yoCxZrAMft0ifL6Imt3CRpUejWQZYO_C?usp=sharing).
+
 ## Citations:
 
 * R. He, J. McAuley. **Modeling the visual evolution of fashion trends
