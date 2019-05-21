@@ -1,6 +1,10 @@
 data/covers/*
+data/covers_normalized/*
+data/coversraw/*
+data/raw/*
 !data/meta
 .idea
 .ipynb_checkpoints/
 __pycache__/
 nohup.out
+parameters/*
