@@ -50,40 +50,46 @@ def plot(labels, data1, label1, data2, label2, filename = None):
     ind = np.arange(len(labels))  # the x locations for the groups
     width = 0.35  # the width of the bars
 
-    print(ind)
-    print(labels)
-    print(data1)
-
     fig, ax = plt.subplots(figsize=(16, 8))
-    rects1 =ax.bar(ind, data1, width, bottom = 0,
-                    color='SkyBlue')
-    #rects1 =ax.bar(ind - width/2, data1, width, bottom = 0,
-    #                color='SkyBlue', label=label1)
-    #rects2 =ax.bar(ind + width/2, data2, width, bottom = 0,
-    #                color='IndianRed', label=label2)
+    
+    rects1 =ax.bar(ind - width/2, data1, width, bottom = 0,
+                    color='SkyBlue', label=label1)
+    rects2 =ax.bar(ind + width/2, data2, width, bottom = 0,
+                    color='IndianRed', label=label2)
 
+    
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('accuracy')
     ax.set_title('Comparison between normalized and non normalized dataset trained on Alexnet')
     ax.set_xticks(ind)
     ax.set_xticklabels(labels, rotation='vertical')
     ax.legend()
+
+    ax.set_ylim(0,100)
+
     if filename is not None:
         plt.savefig('plots/'+filename, dpi = 150)
 
 
 def plot_learning(data, filename = None):
-    fig, ax = plt.subplots(figsize=(30, 20))
+    fig, ax = plt.subplots(figsize=(16, 8))
     x = np.arange(len(data[:,0]))
     
-    line1, = ax.plot(x, data[:,0], label='Loss')
-    line1.set_dashes([2, 2, 10, 2]) 
+    plt.plot(x, data[:,1], label='Top1 Accuracy')
 
-    line2, = ax.plot(x, data[:,1], label='Top1 Accuracy')
+    plt.plot(x, data[:,0], '--', label='Loss')
+
+    plt.plot(x, data[:,2], label='Top3 Accuracy')
+
+    plt.ylim([0, 50])
+
+    plt.xlabel('Nbr of Epochs []')
+    plt.ylabel('Loss [] / Accuracy [%]')
     
-    line3, = ax.plot(x, data[:,2], label='Top3 Accuracy')
+    ax.xaxis.set_major_locator(plt.MaxNLocator(7))
+    ax.yaxis.set_major_locator(plt.MaxNLocator(10))
 
-    ax.legend()
+    #ax.legend()
     if filename is not None:
         plt.savefig('plots/'+filename, dpi = 150)
 
